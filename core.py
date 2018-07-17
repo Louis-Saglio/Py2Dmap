@@ -1,9 +1,14 @@
 import tkinter as _tk
-from random import choices
+from random import choices, randint
+from time import sleep
 from typing import Tuple, Union, Any
 
 
 class MoveException(BaseException):
+    pass
+
+
+class BadPositionException(BaseException):
     pass
 
 
@@ -55,7 +60,11 @@ class Cell:
         self.must_update_gui = False
 
     def get_cell_by_direction(self, direction: Direction) -> "Cell":
-        return self.mother.cells[self.position + direction]
+        try:
+            position = self.position + direction
+            return self.mother.cells[position]
+        except KeyError:
+            raise BadPositionException(f"Position {position} does not exist")
 
     def __hash__(self):
         return hash((hash(self.mother), hash(self.value), hash(self.position)))
