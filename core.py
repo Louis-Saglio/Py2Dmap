@@ -1,5 +1,5 @@
 import tkinter as _tk
-from random import choices, randint
+from random import randint
 from time import sleep
 from typing import Tuple, Union, Any
 
@@ -50,7 +50,6 @@ class Cell:
     def color(self):
         # raise NotImplementedError
         return "#012345" if self.stack else "#543210"
-        # return "#" + "".join(choices("0123456789ABCDEF", k=6))
 
     def update_gui(self):
         if self.frame is None:
@@ -113,11 +112,18 @@ class Pawn:
         self._cell: Cell = None
 
     def move(self, direction: Direction):
-        if self._cell is None:
-            raise MoveException("Can't move because this pawn is not positioned")
-        self._cell.stack.remove(self)
+        try:
+            self._cell.stack.remove(self)
+        except AttributeError:
+            if self._cell is None:
+                raise MoveException("Can't move because this pawn is not positioned")
+        try:
+            next_cell = self._cell.get_cell_by_direction(direction)
+            # Do not corrupt self._cell if an error is incoming
+        except BadPositionException:
+            raise
         self._cell.must_update_gui = True
-        self._cell = self._cell.get_cell_by_direction(direction)
+        self._cell = next_cell
         self._cell.stack.append(self)
         self._cell.must_update_gui = True
 
