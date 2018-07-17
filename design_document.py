@@ -8,6 +8,9 @@ class Unit(Pawn):
     def color(self):
         return "#12FFFAE"
 
+    def run(self):
+        self.move(Direction((1, 1)))
+
 
 UP = Direction((1, 1))
 u = Unit()

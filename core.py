@@ -98,6 +98,11 @@ class Pawn:
         self._cell.stack.append(self)
         self._cell.must_update_gui = True
 
+    def run(self):
+        raise NotImplementedError
+        # self.move(Direction((randint(-1, 1), randint(1, 1))))
+        # sleep(0.3)
+
 
 def test():
     m = Map(30, 50)
