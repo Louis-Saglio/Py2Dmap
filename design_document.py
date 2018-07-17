@@ -1,4 +1,4 @@
-from core import Map, Pawn
+from core import Map, Pawn, Direction
 
 map = Map(8, 5)
 
@@ -8,11 +8,8 @@ class Unit(Pawn):
     def color(self):
         return "#12FFFAE"
 
-    @property
-    def position(self):
-        return 1, 5
 
-
+UP = Direction((1, 1))
 u = Unit()
-map.add_unit(u)
-u.move("up", 1)
+map.add_pawn(u, (2, 3))
+u.move(UP)

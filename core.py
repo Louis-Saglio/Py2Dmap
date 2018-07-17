@@ -3,6 +3,10 @@ from random import choices
 from typing import Tuple, Union, Any
 
 
+class MoveException(BaseException):
+    pass
+
+
 class Direction:
     def __init__(self, vector: Tuple[Union[int, float], Union[int, float]]):
         self.vector = vector
@@ -18,6 +22,12 @@ class Position:
     def __add__(self, direction: Direction):
         return Position((self._position[0] + direction.vector[0], self._position[1] + direction.vector[1]))
 
+    def __hash__(self):
+        return hash(tuple(self._position))
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+
 
 class Cell:
     def __init__(self, mother: "Map", position: Position, value: Any):
@@ -26,13 +36,15 @@ class Cell:
         self.position = position
         self.stack = []
         self.frame = None
+        self.must_update_gui = True
 
     @property
     def color(self):
-        # raise NotImplementedError
-        return "#" + "".join(choices("0123456789ABCDEF", k=6))
+        raise NotImplementedError
+        # return "#012345" if self.stack else "#543210"
+        # return "#" + "".join(choices("0123456789ABCDEF", k=6))
 
-    def configure_gui(self):
+    def update_gui(self):
         if self.frame is None:
             self.frame = _tk.Frame(
                 self.mother, height=self.mother.cell_size, width=self.mother.cell_size, background=self.color
@@ -40,6 +52,10 @@ class Cell:
         else:
             self.frame.configure(background=self.color)
         self.frame.grid(row=self.position[0], column=self.position[1])
+        self.must_update_gui = False
+
+    def get_cell_by_direction(self, direction: Direction) -> "Cell":
+        return self.mother.cells[self.position + direction]
 
     def __hash__(self):
         return hash((hash(self.mother), hash(self.value), hash(self.position)))
@@ -53,22 +69,42 @@ class Map(_tk.Tk):
 
         self.cell_size = 10
 
-        self.cells = set()
+        self.cells = {}
         for i in range(self.width):
             for j in range(self.height):
-                self.cells.add(Cell(self, Position((i, j)), None))
+                position = Position((i, j))
+                self.cells[position] = Cell(self, position, None)
 
-    def configure_gui(self):
-        for cell in self.cells:
-            cell.configure_gui()
+    def update_gui(self):
+        for cell in self.cells.values():
+            if cell.must_update_gui:
+                cell.update_gui()
+
+    def add_pawn(self, pawn: "Pawn", position: Tuple[int, int]):
+        position_ = self.cells[Position(position)]
+        position_.stack.append(pawn)
+        pawn._cell = position_
+
+
+class Pawn:
+    def __init__(self):
+        self._cell: Cell = None
+
+    def move(self, direction: Direction):
+        if self._cell is None:
+            raise MoveException(f"Can't move because this pawn is not positioned.")
+        self._cell.stack.remove(self)
+        self._cell = self._cell.get_cell_by_direction(direction)
+        self._cell.stack.append(self)
+        self._cell.must_update_gui = True
 
 
 def test():
-    Direction((0, -1))
-    p = Position((5, 3))
-    m = Map(40, 52)
-    Cell(m, p, None)
-    m.configure_gui()
+    m = Map(30, 50)
+    p = Pawn()
+    m.add_pawn(p, (3, 2))
+    p.move(Direction((1, 1)))
+    m.update_gui()
     m.mainloop()
 
 
