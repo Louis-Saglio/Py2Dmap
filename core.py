@@ -85,6 +85,14 @@ class Map(_tk.Tk):
         position_.stack.append(pawn)
         pawn._cell = position_
 
+    def mainloop(self, n=0):
+        while True:
+            for cell in self.cells.values():
+                for pawn in cell.stack:
+                    pawn.run()
+                    self.update_gui()
+                    self.update()
+
 
 class Pawn:
     def __init__(self):
@@ -94,6 +102,7 @@ class Pawn:
         if self._cell is None:
             raise MoveException(f"Can't move because this pawn is not positioned.")
         self._cell.stack.remove(self)
+        self._cell.must_update_gui = True
         self._cell = self._cell.get_cell_by_direction(direction)
         self._cell.stack.append(self)
         self._cell.must_update_gui = True
@@ -106,10 +115,7 @@ class Pawn:
 
 def test():
     m = Map(30, 50)
-    p = Pawn()
-    m.add_pawn(p, (3, 2))
-    p.move(Direction((1, 1)))
-    m.update_gui()
+    m.add_pawn(Pawn(), (15, 25))
     m.mainloop()
 
 
