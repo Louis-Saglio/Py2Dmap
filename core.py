@@ -33,6 +33,9 @@ class Position:
     def __eq__(self, other):
         return hash(self) == hash(other)
 
+    def __repr__(self):
+        return f"Position{{{self[0], self[1]}}}"
+
 
 class Cell:
     def __init__(self, mother: "Map", position: Position, value: Any):
@@ -45,8 +48,8 @@ class Cell:
 
     @property
     def color(self):
-        raise NotImplementedError
-        # return "#012345" if self.stack else "#543210"
+        # raise NotImplementedError
+        return "#012345" if self.stack else "#543210"
         # return "#" + "".join(choices("0123456789ABCDEF", k=6))
 
     def update_gui(self):
@@ -64,7 +67,9 @@ class Cell:
             position = self.position + direction
             return self.mother.cells[position]
         except KeyError:
-            raise BadPositionException(f"Position {position} does not exist")
+            raise BadPositionException(
+                f"Position {position} does not exist. Minimum {self.mother.width}, maximum {self.mother.height}"
+            )
 
     def __hash__(self):
         return hash((hash(self.mother), hash(self.value), hash(self.position)))
@@ -109,7 +114,7 @@ class Pawn:
 
     def move(self, direction: Direction):
         if self._cell is None:
-            raise MoveException(f"Can't move because this pawn is not positioned.")
+            raise MoveException("Can't move because this pawn is not positioned")
         self._cell.stack.remove(self)
         self._cell.must_update_gui = True
         self._cell = self._cell.get_cell_by_direction(direction)
@@ -117,9 +122,9 @@ class Pawn:
         self._cell.must_update_gui = True
 
     def run(self):
-        raise NotImplementedError
-        # self.move(Direction((randint(-1, 1), randint(1, 1))))
-        # sleep(0.3)
+        # raise NotImplementedError
+        self.move(Direction((randint(-1, 1), randint(-1, 1))))
+        sleep(0.1)
 
 
 def test():
