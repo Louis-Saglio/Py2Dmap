@@ -42,7 +42,7 @@ class Position:
         return f"Position{{{self[0], self[1]}}}"
 
 
-class Cell:
+class BaseCell:
     def __init__(self, mother: "Map", position: Position):
         self.mother = mother
         self.position = position
@@ -76,7 +76,7 @@ class Cell:
             self.frame.configure(background=self.color)
         self.frame.grid(row=self.position[0], column=self.position[1])
 
-    def get_cell_by_direction(self, direction: Direction) -> "Cell":
+    def get_cell_by_direction(self, direction: Direction) -> "BaseCell":
         try:
             position = self.position + direction
             return self.mother.cells[position]
@@ -93,11 +93,11 @@ class Cell:
         return hash((hash(self.mother), hash(self.position)))
 
     def __repr__(self):
-        return f"Cell{{stack : {self._stack}, position : {self.position}}}"
+        return f"{self.__class__.__name__}{{stack : {self._stack}, position : {self.position}}}"
 
 
 class Map(_tk.Tk):
-    def __init__(self, width: int, height: int):
+    def __init__(self, width: int, height: int, cell_class: type):
         super().__init__()
         self.width = width
         self.height = height
@@ -108,7 +108,7 @@ class Map(_tk.Tk):
         for i in range(self.width):
             for j in range(self.height):
                 position = Position((i, j))
-                self.cells[position] = Cell(self, position)
+                self.cells[position]: BaseCell = cell_class(self, position)
 
     def add_pawn(self, pawn: "Pawn", position: Tuple[int, int]):
         cell = self.cells[Position(position)]
@@ -128,7 +128,7 @@ class Map(_tk.Tk):
 
 class Pawn:
     def __init__(self):
-        self._cell: Cell = None
+        self._cell: BaseCell = None
 
     @property
     def color(self):
