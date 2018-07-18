@@ -12,6 +12,10 @@ class BadPositionException(BaseException):
     pass
 
 
+class InvalidColor(BaseException):
+    pass
+
+
 class Direction:
     def __init__(self, vector: Tuple[Union[int, float], Union[int, float]]):
         self.vector = vector
@@ -59,10 +63,11 @@ class Cell:
 
     @property
     def color(self):
-        # raise NotImplementedError
-        return "#012345" if self.stack else "#543210"
+        raise NotImplementedError
 
     def update_gui(self):
+        if self.color is None:
+            raise InvalidColor(f"Can't use {self.color} as a valid color")
         if self.frame is None:
             self.frame = _tk.Frame(
                 self.mother, height=self.mother.cell_size, width=self.mother.cell_size, background=self.color
@@ -118,6 +123,10 @@ class Map(_tk.Tk):
 class Pawn:
     def __init__(self):
         self._cell: Cell = None
+
+    @property
+    def color(self):
+        raise NotImplementedError
 
     def move(self, direction: Direction):
         if self._cell is None:
