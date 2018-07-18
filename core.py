@@ -85,10 +85,6 @@ class BaseCell:
                 f"Position {position} does not exist. Maximum {self.mother.width - 1}, {self.mother.height - 1}"
             )
 
-    def __iter__(self):
-        for pawn in self._stack:
-            yield pawn
-
     def __hash__(self):
         return hash((hash(self.mother), hash(self.position)))
 
@@ -101,8 +97,9 @@ class Map(_tk.Tk):
         super().__init__()
         self.width = width
         self.height = height
-
         self.cell_size = 10
+
+        self.pawns = set()
 
         self.cells = {}
         for i in range(self.width):
@@ -113,17 +110,20 @@ class Map(_tk.Tk):
     def add_pawn(self, pawn: "Pawn", position: Tuple[int, int]):
         cell = self.cells[Position(position)]
         cell.put(pawn)
+        self.pawns.add(pawn)
+
+    def remove_pawn(self, pawn: "Pawn"):
+        self.pawns.remove(pawn)
+        pawn._cell.remove(pawn)
 
     def mainloop(self, n=0):
         while True:
-            for cell in self.cells.values():
-                for pawn in cell:
-                    pawn.run()
-                    self.update()
+            for pawn in self.pawns:
+                pawn.run()
+                self.update()
 
     def __repr__(self):
-        return "Map"
-    #     return f"Map{{ {self.width, self.height} {self.cells}}}"
+        return f"Map:{id(self)}"
 
 
 class Pawn:
