@@ -1,7 +1,5 @@
 import tkinter as _tk
-from random import randint
-from time import sleep
-from typing import Tuple, Union, Any
+from typing import Tuple, Union
 
 
 class MoveException(BaseException):
@@ -84,7 +82,7 @@ class Cell:
             return self.mother.cells[position]
         except KeyError:
             raise BadPositionException(
-                f"Position {position} does not exist. Minimum {self.mother.width}, maximum {self.mother.height}"
+                f"Position {position} does not exist. Maximum {self.mother.width - 1}, {self.mother.height - 1}"
             )
 
     def __iter__(self):
@@ -148,13 +146,3 @@ class Pawn:
 
     def __repr__(self):
         return f"{self.__class__.__name__}:{id(self)}"
-
-
-def test():
-    m = Map(30, 50)
-    m.add_pawn(Pawn(), (15, 25))
-    m.mainloop()
-
-
-if __name__ == "__main__":
-    test()

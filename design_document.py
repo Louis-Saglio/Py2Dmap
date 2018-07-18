@@ -1,18 +1,19 @@
-from core import Map, Pawn, Direction
+from time import sleep
 
-map = Map(8, 5)
+from core import Map, Pawn, Direction
 
 
 class Unit(Pawn):
     @property
     def color(self):
-        return "#12FFFAE"
+        return "#123AAE"
 
     def run(self):
         self.move(Direction((1, 1)))
+        sleep(0.1)
 
 
-UP = Direction((1, 1))
-u = Unit()
-map.add_pawn(u, (2, 3))
-u.move(UP)
+m = Map(30, 50)
+for i in range(1):
+    m.add_pawn(Unit(), (15, 25))
+m.mainloop()
