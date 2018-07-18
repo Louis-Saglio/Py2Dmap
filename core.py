@@ -20,6 +20,9 @@ class Direction:
     def __init__(self, vector: Tuple[Union[int, float], Union[int, float]]):
         self.vector = vector
 
+    def __repr__(self):
+        return f"Direction{{{self.vector}}}"
+
 
 class Position:
     def __init__(self, position: Tuple[Union[int, float], Union[int, float]]):
@@ -42,8 +45,7 @@ class Position:
 
 
 class Cell:
-    def __init__(self, mother: "Map", position: Position, value: Any):
-        self.value = value
+    def __init__(self, mother: "Map", position: Position):
         self.mother = mother
         self.position = position
         self._stack = []
@@ -86,7 +88,10 @@ class Cell:
             )
 
     def __hash__(self):
-        return hash((hash(self.mother), hash(self.value), hash(self.position)))
+        return hash((hash(self.mother), hash(self.position)))
+
+    def __repr__(self):
+        return f"Cell{{stack : {self._stack}, position : {self.position}}}"
 
 
 class Map(_tk.Tk):
@@ -101,12 +106,7 @@ class Map(_tk.Tk):
         for i in range(self.width):
             for j in range(self.height):
                 position = Position((i, j))
-                self.cells[position] = Cell(self, position, None)
-
-    def update_gui(self):
-        for cell in self.cells.values():
-            if cell.must_update_gui:
-                cell.update_gui()
+                self.cells[position] = Cell(self, position)
 
     def add_pawn(self, pawn: "Pawn", position: Tuple[int, int]):
         cell = self.cells[Position(position)]
@@ -118,6 +118,10 @@ class Map(_tk.Tk):
                 for pawn in cell.stack:
                     pawn.run()
                     self.update()
+
+    def __repr__(self):
+        return "Map"
+    #     return f"Map{{ {self.width, self.height} {self.cells}}}"
 
 
 class Pawn:
@@ -136,9 +140,10 @@ class Pawn:
         next_cell.put(self)
 
     def run(self):
-        # raise NotImplementedError
-        self.move(Direction((randint(-1, 1), randint(-1, 1))))
-        sleep(0.1)
+        raise NotImplementedError
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}:{id(self)}"
 
 
 def test():
