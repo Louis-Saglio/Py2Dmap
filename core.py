@@ -42,9 +42,20 @@ class Cell:
         self.value = value
         self.mother = mother
         self.position = position
-        self.stack = []
+        self._stack = []
         self.frame = None
-        self.must_update_gui = True
+        self.update_gui()
+
+    def put(self, pawn: "Pawn"):
+        # todo : move to Pawn ?
+        self._stack.append(pawn)
+        self.update_gui()
+        pawn._cell = self
+
+    def remove(self, pawn: "Pawn"):
+        self._stack.remove(pawn)
+        self.update_gui()
+        pawn._cell = None
 
     @property
     def color(self):
@@ -59,7 +70,6 @@ class Cell:
         else:
             self.frame.configure(background=self.color)
         self.frame.grid(row=self.position[0], column=self.position[1])
-        self.must_update_gui = False
 
     def get_cell_by_direction(self, direction: Direction) -> "Cell":
         try:
@@ -94,16 +104,14 @@ class Map(_tk.Tk):
                 cell.update_gui()
 
     def add_pawn(self, pawn: "Pawn", position: Tuple[int, int]):
-        position_ = self.cells[Position(position)]
-        position_.stack.append(pawn)
-        pawn._cell = position_
+        cell = self.cells[Position(position)]
+        cell.put(pawn)
 
     def mainloop(self, n=0):
         while True:
             for cell in self.cells.values():
                 for pawn in cell.stack:
                     pawn.run()
-                    self.update_gui()
                     self.update()
 
 
@@ -112,20 +120,11 @@ class Pawn:
         self._cell: Cell = None
 
     def move(self, direction: Direction):
-        try:
-            self._cell.stack.remove(self)
-        except AttributeError:
-            if self._cell is None:
-                raise MoveException("Can't move because this pawn is not positioned")
-        try:
-            next_cell = self._cell.get_cell_by_direction(direction)
-            # Do not corrupt self._cell if an error is incoming
-        except BadPositionException:
-            raise
-        self._cell.must_update_gui = True
-        self._cell = next_cell
-        self._cell.stack.append(self)
-        self._cell.must_update_gui = True
+        if self._cell is None:
+            raise MoveException("Can't move because this pawn is not positioned")
+        next_cell = self._cell.get_cell_by_direction(direction)  # Do not corrupt self._cell if an error is incoming
+        self._cell.remove(self)
+        next_cell.put(self)
 
     def run(self):
         # raise NotImplementedError
