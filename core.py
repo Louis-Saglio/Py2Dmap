@@ -87,6 +87,10 @@ class Cell:
                 f"Position {position} does not exist. Minimum {self.mother.width}, maximum {self.mother.height}"
             )
 
+    def __iter__(self):
+        for pawn in self._stack:
+            yield pawn
+
     def __hash__(self):
         return hash((hash(self.mother), hash(self.position)))
 
@@ -115,7 +119,7 @@ class Map(_tk.Tk):
     def mainloop(self, n=0):
         while True:
             for cell in self.cells.values():
-                for pawn in cell.stack:
+                for pawn in cell:
                     pawn.run()
                     self.update()
 
