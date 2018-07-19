@@ -2,10 +2,6 @@ import tkinter as _tk
 from typing import Tuple, Union
 
 
-class MoveException(BaseException):
-    pass
-
-
 class BadPositionException(BaseException):
     pass
 
@@ -139,12 +135,12 @@ class Pawn:
     def color(self):
         raise NotImplementedError
 
-    def move(self, direction: Direction):
-        if self._cell is None:
-            raise MoveException("Can't move because this pawn is not positioned")
-        next_cell = self._cell.get_cell_by_direction(direction)  # Do not corrupt self._cell if an error is incoming
-        self._cell.remove(self)
+    def go_to(self, next_cell: BaseCell):
+        self.cell.remove(self)
         next_cell.put(self)
+
+    def move_towards(self, direction: Direction):
+        self.go_to(self.cell.get_cell_by_direction(direction))
 
     def run(self):
         raise NotImplementedError
