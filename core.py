@@ -54,12 +54,12 @@ class BaseCell:
         # todo : move to Pawn ?
         self._stack.append(pawn)
         self.update_gui()
-        pawn._cell = self
+        pawn.cell = self
 
     def remove(self, pawn: "Pawn"):
         self._stack.remove(pawn)
         self.update_gui()
-        pawn._cell = None
+        pawn.cell = None
 
     @property
     def color(self):
@@ -114,7 +114,7 @@ class Map(_tk.Tk):
 
     def remove_pawn(self, pawn: "Pawn"):
         self.pawns.remove(pawn)
-        pawn._cell.remove(pawn)
+        pawn.cell.remove(pawn)
 
     def mainloop(self, n=0):
         while True:
@@ -128,7 +128,7 @@ class Map(_tk.Tk):
 
 class Pawn:
     def __init__(self):
-        self._cell: BaseCell = None
+        self.cell: BaseCell = None
 
     @property
     def color(self):
