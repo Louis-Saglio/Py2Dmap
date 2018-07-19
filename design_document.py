@@ -1,7 +1,7 @@
 from random import randint
 from time import sleep
 
-from core import Map, Pawn, Direction, BaseCell, Position
+from core import Map, Pawn, Direction, BaseCell
 
 
 class Unit(Pawn):
@@ -10,8 +10,7 @@ class Unit(Pawn):
         return "#123AAE"
 
     def run(self):
-        try:self.move(Direction((randint(-1, 1), randint(-1, 1))))
-        except:pass
+        self.move_towards(Direction((randint(-1, 1), randint(-1, 1))))
         sleep(0.05)
 
 
@@ -29,5 +28,5 @@ for i in range(10):
     m.add_pawn(Unit(), (15, 25))
 u = Unit()
 m.add_pawn(u, (14, 14))
-m.remove(u)
+m.remove_pawn(u)
 m.mainloop()
