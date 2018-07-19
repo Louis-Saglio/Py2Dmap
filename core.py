@@ -118,9 +118,14 @@ class Map(_tk.Tk):
 
     def mainloop(self, n=0):
         while True:
-            for pawn in self.pawns:
-                pawn.run()
-                self.update()
+            pawns = self.pawns.copy()
+            for pawn in pawns:
+                if pawn in self.pawns:
+                    try:
+                        pawn.run()
+                        self.update()
+                    except _tk.TclError:
+                        exit()
 
     def __repr__(self):
         return f"Map:{id(self)}"
