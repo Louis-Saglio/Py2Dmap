@@ -72,14 +72,14 @@ class BaseCell:
             self.frame.configure(background=self.color)
         self.frame.grid(row=self.position[0], column=self.position[1])
 
-    def get_cell_by_direction(self, direction: Direction) -> "BaseCell":
-        try:
-            position = self.position + direction
-            return self.mother.cells[position]
-        except KeyError:
-            raise BadPositionException(
-                f"Position {position} does not exist. Maximum {self.mother.width - 1}, {self.mother.height - 1}"
-            )
+    def get_cell_by_direction(self, direction: Direction, default=BadPositionException) -> "BaseCell":
+        position = self.position + direction
+        cell = self.mother.cells.get(position, default)
+        if cell is not BadPositionException:
+            return cell
+        raise BadPositionException(
+            f"Position {position} does not exist. Maximum {self.mother.width - 1}, {self.mother.height - 1}"
+        )
 
     def __hash__(self):
         return hash((hash(self.mother), hash(self.position)))
